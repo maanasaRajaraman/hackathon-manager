@@ -1,0 +1,18 @@
+HackathonManager/
+    manage.py
+    HackathonManager/
+        settings.py
+        urls.py
+    hackathon/
+        models.py
+        views.py
+        templates/
+            home.html
+            register.html
+            themes.html
+            submit_project.html
+            admin_dashboard.html
+        static/
+            css/
+            js/
+        migrations/

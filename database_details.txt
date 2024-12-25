@@ -1,0 +1,17 @@
+This project uses SQL Server Management Studio (SSMS), to store data in the backend.
+Instructions :
+
+Configure your database in HackathonManager/settings.py under DATABASES
+Run migrations :
+    python manage.py makemigrations
+    python manage.py migrate
+
+To create superuser :
+    python manage.py createsuperuser
+
+To start development server :
+    python manage.py runserver
+
+Usage
+- Visit http://127.0.0.1:8000/ to access the home page.
+- Use the admin interface at http://127.0.0.1:8000/admin/ for managing users, themes, and submissions.
