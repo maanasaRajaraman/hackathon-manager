@@ -4,46 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hackathon Manager Home Page</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            margin: 20px;
-        }
-        h1 {
-            color: #333;
-        }
-        .button-container {
-            margin-top: 30px;
-        }
-        button {
-            background-color: #007BFF;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            margin: 10px;
-            font-size: 16px;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
-    </style>
-    <script>
-        // JavaScript to handle pop-up after submission
-        function showPopup(message) {
-            alert(message);
-        }
-    </script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-<body>
-    <h1>Hackathon Manager Home Page</h1>
-    <div class="button-container">
-        <button onclick="window.location.href='/register/'">Register</button>
-        <button onclick="window.location.href='/themes/'">View Themes</button>
-        <button onclick="window.location.href='/submit_project/'">Submit</button>
-        <button onclick="window.location.href='/admin_login/'">Login as Admin</button>
+<body class="bg-light text-center">
+    <div class="container py-5">
+        <h1 class="mb-4 text-primary">Hackathon Manager Home Page</h1>
+        <div class="d-flex justify-content-center flex-wrap">
+            <a href="/register/" class="btn btn-primary m-2">Register</a>
+            <a href="/themes/" class="btn btn-success m-2">View Themes</a>
+            <a href="/submit_project/" class="btn btn-warning m-2">Submit</a>
+            <a href="/admin_login/" class="btn btn-secondary m-2">Login as Admin</a>
+        </div>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
