@@ -1,0 +1,21 @@
+<form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    <label>Team Name:</label>
+    <input type="text" name="team_name" required><br>
+    <label>Project Name:</label>
+    <input type="text" name="project_name" required><br>
+    <label>Theme:</label>
+    <select name="theme" required>
+        {% for theme in themes %}
+            <option value="{{ theme.id }}">{{ theme.name }}</option>
+        {% endfor %}
+    </select>
+
+    <label>GitHub Link:</label>
+    <input type="url" name="github_link" required><br>
+    <label>Summary and Details Document:</label>
+    <input type="file" name="summary_details" required><br>
+    <label>Other Documents (Optional):</label>
+    <input type="file" name="other_docs"><br>
+    <button type="submit">Submit</button>
+</form>

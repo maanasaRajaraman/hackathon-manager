@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        h1, h2 {
+            color: #333;
+        }
+        .logout-container {
+            margin-top: 50px;
+            text-align: center;
+        }
+        .logout-button {
+            background-color: #FF5733;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .logout-button:hover {
+            background-color: #C70039;
+        }
+    </style>
+</head>
+<body>
+    <h1>Hackathon Manager</h1>
+    <h2>Welcome Admin</h2>
+
+    <!-- Left Section: Theme-wise Counts -->
+    <div style="float: left; width: 30%;">
+        <h3>Theme-Wise Submission Counts</h3>
+        <table border="1" style="border-collapse: collapse; width: 100%;">
+            <tr>
+                <th>Theme</th>
+                <th>Submissions</th>
+            </tr>
+            {% for theme in theme_counts %}
+            <tr>
+                <td>{{ theme.name }}</td>
+                <td>{{ theme.count }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+    <!-- Right Section: Admin Actions -->
+    <div style="float: right; width: 65%;">
+        <h3>Admin Actions</h3>
+        <p>
+            <a href="/submissions_page/" style="text-decoration: none; color: blue;">Number of submissions: {{ total_submissions }}</a>
+        </p>
+        <p>
+            <a href="/generate_feedback/" style="text-decoration: none; color: blue;">Generate Feedback</a>
+        </p>
+    </div>
+
+    <!-- Logout Button -->
+    <div class="logout-container">
+        <a href="/logout/">
+            <button class="logout-button">Logout</button>
+        </a>
+    </div>
+</body>
+</html>

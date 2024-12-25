@@ -1,0 +1,25 @@
+<h2>Submissions</h2>
+<ul>
+    {% for submission in submissions %}
+    <li onclick="toggleDetails('{{ submission.id }}')">{{ submission.team_name }}
+        <div id="details-{{ submission.id }}" style="display:none;">
+            <p>Project: {{ submission.project_name }}</p>
+            <p>GitHub: {{ submission.github_link }}</p>
+            <p>Theme: {{ submission.theme.name }}</p>
+            <p>Timestamp: {{ submission.timestamp }}</p>
+            <p>
+                <a href="{{ submission.summary_details.url }}">View Summary</a>
+                {% if submission.other_docs %}
+                | <a href="{{ submission.other_docs.url }}">View Other Docs</a>
+                {% endif %}
+            </p>
+        </div>
+    </li>
+    {% endfor %}
+</ul>
+<script>
+function toggleDetails(id) {
+    var details = document.getElementById("details-" + id);
+    details.style.display = details.style.display === "none" ? "block" : "none";
+}
+</script>

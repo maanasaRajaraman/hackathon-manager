@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hackathon Themes</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        h2 {
+            color: #333;
+        }
+        .theme-container {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+        }
+        .theme-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #007BFF;
+        }
+        .theme-description {
+            margin-top: 5px;
+        }
+        .button-container {
+            margin-top: 30px;
+            text-align: center;
+        }
+        button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h2>Hackathon Themes</h2>
+    {% for theme in themes %}
+    <div class="theme-container">
+        <div class="theme-title">{{ theme.name }}</div>
+        <div class="theme-description">{{ theme.description }}</div>
+    </div>
+    {% endfor %}
+    <div class="button-container">
+        <button onclick="window.location.href='/'">Back to Home Page</button>
+        <button onclick="window.location.href='/submit_project/'">Submit Solution</button>
+    </div>
+</body>
+</html>
