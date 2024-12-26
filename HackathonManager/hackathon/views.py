@@ -61,7 +61,7 @@ def submit_project(request):
     return render(request, 'submit_project.html', {'themes': themes})
 
 
-GEMINI_API_KEY = 'AIzaSyAcFpKQo3hk1Z2jdtYO4LNpoNVafVZxfmI'
+GEMINI_API_KEY = 'gemini_key'
 genai.configure(api_key=(GEMINI_API_KEY))
 
 def generate_feedback(summary_content):
