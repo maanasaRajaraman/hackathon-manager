@@ -1,3 +1,5 @@
+import textwrap
+
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from .models import Participant, Theme, Submission
@@ -6,7 +8,9 @@ from django.shortcuts import get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login
 from django.db import models
-
+import os
+import google.generativeai as genai
+import re
 
 def themes(request):
     themes = Theme.objects.all()
@@ -56,23 +60,24 @@ def submit_project(request):
     themes = Theme.objects.all()
     return render(request, 'submit_project.html', {'themes': themes})
 
-# Add your own api key
-openai.api_key = "your_api_key"
 
+GEMINI_API_KEY = 'AIzaSyAcFpKQo3hk1Z2jdtYO4LNpoNVafVZxfmI'
+genai.configure(api_key=(GEMINI_API_KEY))
 
-def generate_feedback(submission_id):
-    submission = get_object_or_404(Submission, id=submission_id)
-    file_content = submission.summary_details.read().decode('utf-8')
-
-    response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
-        messages=[
-            {"role": "system", "content": "You are a helpful assistant for generating project feedback."},
-            {"role": "user", "content": f"Provide constructive feedback for this project: {file_content}"}
-        ]
-    )
-    feedback_text = response['choices'][0]['message']['content']
-    return feedback_text
+def generate_feedback(summary_content):
+    try:
+        response = genai.generate_message(
+            model="gemini-1.5-pro-latest",  # Replace with the appropriate model name
+            messages=[
+                {"role": "system", "content": "You are a helpful assistant that provides feedback for projects."},
+                {"role": "user", "content": f"Provide detailed feedback for the following project summary:\n\n{summary_content}"}
+            ],
+            max_output_tokens=500
+        )
+        feedback = response['candidates'][0]['content']  # Extract feedback from the response
+        return feedback
+    except Exception as e:
+        return f"Error generating feedback: {str(e)}"
 
 
 def feedback_submission(request, submission_id):
@@ -111,16 +116,94 @@ def submissions_page(request):
     return render(request, 'submissions_page.html', {'submissions': submissions})
 
 
+import google.generativeai as genai
+from django.shortcuts import render, get_object_or_404
+from .models import Submission
+
+# Define the model globally to avoid re-instantiating it in every request
+model = genai.GenerativeModel("gemini-1.5-pro-latest")
+
 def generate_feedback_page(request):
-    teams = Submission.objects.values('id', 'team_name')
+    def format_text(text):
+        # Convert '**' to bold (<b>...</b>)
+        text = re.sub(r"\*\*(.*?)\*\*", r"<b>\1</b>", text)
 
-    if request.method == 'POST':
-        submission_id = request.POST['submission_id']
-        feedback = generate_feedback(submission_id)
+        # Convert '*' to bullets (<li>...</li>)
+        text = re.sub(r"\*\s(.*?)(?=(\*\s|$))", r"<li>\1</li>", text)
 
-        return render(request, 'generate_feedback_page.html', {
-            'teams': teams,
-            'feedback': feedback
-        })
+        # Wrap bullets in a <ul> tag
+        text = re.sub(r"(<li>.*?</li>)", r"<ul>\1</ul>", text, flags=re.DOTALL)
 
-    return render(request, 'generate_feedback_page.html', {'teams': teams})
+        return text
+    def beautify_feedback(raw_feedback):
+        # Split feedback into sections based on predefined keywords
+        sections = {
+            "Overview": [],
+            "Strengths": [],
+            "Weaknesses": [],
+            "Suggestions for Improvement": [],
+            "Example of a Revised Summary": []
+        }
+
+        # Determine the current section and append lines to it
+        current_section = None
+        for line in raw_feedback.splitlines():
+            if "**Strengths:**" in line:
+                current_section = "Strengths"
+            elif "**Weaknesses:**" in line:
+                current_section = "Weaknesses"
+            elif "**Suggestions for Improvement:**" in line:
+                current_section = "Suggestions for Improvement"
+            elif "**Revised Summary Example" in line:
+                current_section = "Example of a Revised Summary"
+            elif "**Overview:**" in line:
+                current_section = "Overview"
+            elif current_section:
+                sections[current_section].append(line)
+
+        # Beautify each section
+        beautified_feedback = []
+        for section, content in sections.items():
+            beautified_feedback.append(f"### {section}")
+            for paragraph in content:
+                paragraph = paragraph.strip()
+                if paragraph.startswith("*"):
+                    # Format as list items
+                    beautified_feedback.append(f"- {paragraph[1:].strip()}")
+                elif paragraph.startswith("```"):
+                    # Handle code block formatting
+                    beautified_feedback.append(paragraph)
+                elif paragraph:
+                    # Wrap and format normal text
+                    wrapped = textwrap.fill(paragraph, width=80)
+                    beautified_feedback.append(wrapped)
+
+        return "\n\n".join(beautified_feedback)
+
+    if request.method == "POST":
+        submission_id = request.POST.get("submission_id")
+        submission = get_object_or_404(Submission, id=submission_id)
+
+        # Read the summary document content
+        summary_path = submission.summary_details.path
+        with open(summary_path, "r") as file:
+            summary_content = file.read()
+
+        # Generate feedback using Gemini API
+        try:
+            response = model.generate_content(
+                f"Provide detailed feedback for the following project summary:\n\n{summary_content}",
+                generation_config=genai.GenerationConfig(
+                    response_mime_type="text/plain"  # Use "text/plain" for simple text responses
+                ),
+            )
+            feedback = response.__getattribute__("_result").candidates[0].content.parts[0].text
+            feedback = format_text(feedback)
+        except Exception as e:
+            feedback = f"Error generating feedback: {str(e)}"
+
+        return render(request, "submission_feedback.html", {"feedback": feedback})
+
+    # If GET, render the form
+    teams = Submission.objects.all()
+    return render(request, "generate_feedback_page.html", {"teams": teams})
